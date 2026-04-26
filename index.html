@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Helen War - Tactical AI Fixed</title>
+    <title>Rika War - Tactical AI Fixed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
@@ -188,7 +188,16 @@
     }
 
     function spawnBullet(owner, angle) {
-        bullets.push({ x: owner.x + Math.cos(angle)*40, y: owner.y + Math.sin(angle)*40, vx: Math.cos(angle)*owner.bSpeed, vy: Math.sin(angle)*owner.bSpeed, r: owner.bSize, color: owner.color, owner: owner });
+        // Bullet spawn offset matches the "nose" position
+        bullets.push({ 
+            x: owner.x + Math.cos(angle)*30, 
+            y: owner.y + Math.sin(angle)*30, 
+            vx: Math.cos(angle)*owner.bSpeed, 
+            vy: Math.sin(angle)*owner.bSpeed, 
+            r: owner.bSize, 
+            color: owner.color, 
+            owner: owner 
+        });
     }
 
     function update() {
@@ -206,7 +215,6 @@
             enemy.angle = Math.atan2(dy, dx);
             
             if(d > 350) { 
-                // AI Move + Collision (Fix applied here)
                 let amx = (dx/d)*(enemy.speed*0.8), amy = (dy/d)*(enemy.speed*0.8);
                 let anx = enemy.x + amx, any = enemy.y + amy;
                 if(!checkWall(enemy, anx, enemy.y)) enemy.x = anx;
@@ -260,10 +268,30 @@
         ctx.scale(scale, scale);
         ctx.fillStyle = "#0ff";
         walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
+
         [player, enemy].forEach(c => {
-            ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.angle);
-            ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(0,0,c.r,0,Math.PI*2); ctx.fill();
-            for(let i=0; i<c.hp; i++) { ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333"; ctx.fillRect(-22 + i*12, 14, 8, 8); }
+            ctx.save(); 
+            ctx.translate(c.x, c.y); 
+            ctx.rotate(c.angle); // This rotates the whole drawing coordinate system
+            
+            // Character body
+            ctx.fillStyle = c.color; 
+            ctx.beginPath(); 
+            ctx.arc(0,0,c.r,0,Math.PI*2); 
+            ctx.fill();
+
+            // The "Nose" (white dot) - Now perfectly in the front center
+            ctx.fillStyle = '#fff'; 
+            ctx.beginPath(); 
+            ctx.arc(c.r - 5, 0, 6, 0, Math.PI*2); 
+            ctx.fill();
+
+            // Armor/HP Squares
+            ctx.rotate(-c.angle); // Counter-rotate text/UI so it stays level
+            for(let i=0; i<c.hp; i++) { 
+                ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333"; 
+                ctx.fillRect(-22 + i*12, 14 + c.r/2, 8, 8); 
+            }
             ctx.restore();
         });
         bullets.forEach(b => { ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); });
@@ -276,11 +304,24 @@
         if(!stick.active) return;
         let r = document.getElementById('joyBase').getBoundingClientRect();
         let dx = e.touches[0].clientX - (r.left+50), dy = e.touches[0].clientY - (r.top+50);
-        let d = Math.hypot(dx,dy); if(d>40) { dx*=40/d; dy*=40/d; }
-        stick.x = dx/40; stick.y = dy/40; player.angle = Math.atan2(dy,dx);
+        let d = Math.hypot(dx,dy); 
+        if(d>40) { dx*=40/d; dy*=40/d; }
+        stick.x = dx/40; 
+        stick.y = dy/40; 
+        
+        // Update angle immediately on movement so nose points where you go
+        if (Math.abs(stick.x) > 0.1 || Math.abs(stick.y) > 0.1) {
+            player.angle = Math.atan2(dy, dx);
+        }
+        
         document.getElementById('joyKnob').style.transform = `translate(${dx}px,${dy}px)`;
     }, {passive: false});
-    window.addEventListener('touchend', () => { stick.active=false; stick.x=0; stick.y=0; document.getElementById('joyKnob').style.transform=`translate(0,0)`; });
+    
+    window.addEventListener('touchend', () => { 
+        stick.active=false; stick.x=0; stick.y=0; 
+        document.getElementById('joyKnob').style.transform=`translate(0,0)`; 
+    });
+    
     document.getElementById('fireBtn').addEventListener('touchstart', e => { e.preventDefault(); fire(player, player.angle); });
     window.addEventListener('resize', resize);
 </script>
