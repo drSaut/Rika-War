@@ -23,7 +23,6 @@
         .char-card:active { transform: scale(0.98); }
         .char-card h3 { font-size: 18px; margin-bottom: 4px; }
         .char-card p { font-size: 10px; color: #bbb; line-height: 1.2; }
-        .char-card .stat-bar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); text-align: right; font-size: 10px; color: #0f0; }
 
         #ui { position: absolute; top: 20px; width: 100%; display: none; justify-content: space-around; z-index: 10; pointer-events: none; }
         .score-card { border: 2px solid #00ff00; padding: 8px 20px; border-radius: 10px; background: rgba(0,0,0,0.8); font-size: 22px; }
@@ -44,7 +43,7 @@
     <div id="notif">POINT!</div>
 
     <div id="menu">
-        <h1>HELEN WAR</h1>
+        <h1>RIKA WAR</h1>
         <p class="instr">TACTICAL CLASS COMBAT</p>
         <button class="btn" onclick="showCharSelect('ai')">OFFLINE VS AI</button>
         <button class="btn" onclick="showOnlineMenu()">ONLINE VS FRIEND</button>
@@ -59,24 +58,24 @@
         <h1>SELECT CLASS</h1>
         <div class="char-grid">
             <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0">
-                <h3 style="color:#0f0">SCOUT</h3>
-                <p>FASTEST MOVE. FAST RELOAD.<br>HP: 1 | SPEED: 8.5</p>
+                <h3 style="color:#0f0">HANUM</h3>
+                <p>HP: 1 | SPEED: 8.5 | RELOAD: FAST</p>
             </div>
             <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af">
-                <h3 style="color:#0af">TANK</h3>
-                <p>ULTRA ARMOR. SLOW MOVE.<br>HP: 4 | SPEED: 3.5</p>
+                <h3 style="color:#0af">RIKA</h3>
+                <p>HP: 4 | SPEED: 3.5 | HEAVY ARMOR</p>
             </div>
             <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44">
-                <h3 style="color:#f44">GHOST</h3>
-                <p>3-ROUND BURST FIRE.<br>HP: 1 | SPEED: 6.5</p>
+                <h3 style="color:#f44">SATRI</h3>
+                <p>HP: 1 | SPEED: 6.5 | 3-ROUND BURST</p>
             </div>
             <div class="char-card" onclick="selectChar('sniper')" style="border-color:#a0f">
-                <h3 style="color:#a0f">SNIPER</h3>
-                <p>LONG RANGE. FAST BULLETS.<br>HP: 1 | SPEED: 5.5</p>
+                <h3 style="color:#a0f">IKA BINAL</h3>
+                <p>HP: 1 | SPEED: 5.5 | ULTRA-FAST BULLET</p>
             </div>
             <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80">
-                <h3 style="color:#f80">HEAVY</h3>
-                <p>LARGE BULLETS. BALANCED ARMOR.<br>HP: 2 | SPEED: 5.0</p>
+                <h3 style="color:#f80">HELEM</h3>
+                <p>HP: 2 | SPEED: 5.0 | MASSIVE ROUNDS</p>
             </div>
         </div>
     </div>
@@ -180,20 +179,39 @@
         canvas.style.display = 'block';
     }
 
+    // ORIGINAL WALL GENERATION LOGIC
     function generateWalls() {
-        let t = 20;
-        let arr = [{x:0, y:0, w:V_WIDTH, h:t}, {x:0, y:V_HEIGHT-t, w:V_WIDTH, h:t}, {x:0, y:0, w:t, h:V_HEIGHT}, {x:V_WIDTH-t, y:0, w:t, h:V_HEIGHT}];
-        for(let i=0; i<7; i++) arr.push({x:100+Math.random()*400, y:250+Math.random()*700, w:Math.random()>0.5?25:160, h:Math.random()>0.5?160:25});
+        let t = 15; // Border thickness
+        let arr = [
+            {x:0, y:0, w:V_WIDTH, h:t}, // Top
+            {x:0, y:V_HEIGHT-t, w:V_WIDTH, h:t}, // Bottom
+            {x:0, y:0, w:t, h:V_HEIGHT}, // Left
+            {x:V_WIDTH-t, y:0, w:t, h:V_HEIGHT} // Right
+        ];
+        
+        const wallCount = 6 + Math.floor(Math.random()*4);
+        for(let i=0; i < wallCount; i++) {
+            let isV = Math.random() > 0.5;
+            let ww = isV ? 20 : 120 + Math.random()*150;
+            let hh = isV ? 120 + Math.random()*150 : 20;
+            let wx = 100 + Math.random()*(V_WIDTH-300);
+            let wy = 200 + Math.random()*(V_HEIGHT-500);
+            // Safety: Don't spawn walls exactly on start corners
+            if ((wx < 200 && wy < 200) || (wx > V_WIDTH-200 && wy > V_HEIGHT-200)) continue;
+            arr.push({x:wx, y:wy, w:ww, h:hh});
+        }
         return arr;
     }
 
     function resetRound() {
         const p = 120;
-        player.x = (mode === "guest") ? V_WIDTH-p : p;
-        player.y = (mode === "guest") ? V_HEIGHT-p : p;
-        enemy.x = enemy.targetX = (mode === "guest") ? p : V_WIDTH-p;
-        enemy.y = enemy.targetY = (mode === "guest") ? p : V_HEIGHT-p;
-        player.currentHp = player.hp; enemy.currentHp = enemy.hp;
+        if(mode === "guest") {
+            player.x = V_WIDTH-p; player.y = V_HEIGHT-p;
+            enemy.x = enemy.targetX = p; enemy.y = enemy.targetY = p;
+        } else {
+            player.x = p; player.y = p;
+            enemy.x = enemy.targetX = V_WIDTH-p; enemy.y = enemy.targetY = V_HEIGHT-p;
+        }
         bullets = []; isPaused = false;
     }
 
@@ -224,7 +242,6 @@
         if(mode !== "ai") {
             enemy.x += (enemy.targetX - enemy.x) * 0.25; enemy.y += (enemy.targetY - enemy.y) * 0.25;
         } else {
-            // TACTICAL AI
             let dx = player.x - enemy.x, dy = player.y - enemy.y, d = Math.hypot(dx,dy);
             if(d > 350) { 
                 let mx = (dx/d)*enemy.speed, my = (dy/d)*enemy.speed;
@@ -257,8 +274,8 @@
 
     function checkDeaths() {
         if(isPaused) return;
-        if(player.currentHp <= 0) { eScore++; finishRound("YOU WERE ELIMINATED"); }
-        else if(enemy.currentHp <= 0) { pScore++; finishRound("MISSION SUCCESS"); }
+        if(player.currentHp <= 0) { eScore++; finishRound("ELIMINATED"); }
+        else if(enemy.currentHp <= 0) { pScore++; finishRound("VICTORY"); }
         document.getElementById('pScore').innerText = pScore; document.getElementById('eScore').innerText = eScore;
     }
 
@@ -267,19 +284,24 @@
         setTimeout(() => { n.style.display = 'none'; resetRound(); }, 2000);
     }
 
-    function checkWall(o, nx, ny) { for(let w of walls) if(nx+o.r>w.x && nx-o.r<w.x+w.w && ny+o.r>w.y && ny-o.r<w.y+w.h) return true; return false; }
+    function checkWall(o, nx, ny) { 
+        for(let w of walls) if(nx+o.r>w.x && nx-o.r<w.x+w.w && ny+o.r>w.y && ny-o.r<w.y+w.h) return true; 
+        return false; 
+    }
 
     function draw() {
         ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.scale(scale, scale);
         
-        ctx.strokeStyle = "#0ff"; ctx.lineWidth = 3;
+        // WALL RENDERING WITH NEON GLOW
+        ctx.shadowBlur = 10; ctx.shadowColor = "#0ff";
+        ctx.strokeStyle = "#0ff"; ctx.lineWidth = 4;
         walls.forEach(w => ctx.strokeRect(w.x, w.y, w.w, w.h));
+        ctx.shadowBlur = 0;
         
         [player, enemy].forEach(c => {
             ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.angle);
             ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(0,0,c.r,0,Math.PI*2); ctx.fill();
-            // HP Bars
             for(let i=0; i<c.hp; i++) {
                 ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333";
                 ctx.fillRect(-20 + i*12, 12, 8, 8);
