@@ -2,81 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Helen War - 5 Legends</title>
+    <title>Helen War - Tactical AI Fixed</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: #fff; }
-        canvas { display: none; touch-action: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid #333; }
-        
-        #menu, #char-select { position: absolute; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5000; overflow-y: auto; padding: 20px 0; }
-        #char-select { display: none; background: rgba(0,0,0,0.95); }
-        
-        h1 { font-size: 38px; color: #00ff00; text-shadow: 0 0 20px #00ff00; margin-bottom: 5px; }
-        .instr { font-size: 11px; margin-bottom: 20px; color: #888; letter-spacing: 2px; }
-        
-        .btn { width: 260px; padding: 15px; margin: 8px; border: 2px solid #00ff00; background: rgba(0,255,0,0.05); color: #00ff00; font-weight: bold; cursor: pointer; border-radius: 12px; text-transform: uppercase; }
-        
-        .char-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 90%; max-width: 400px; }
-        .char-card { padding: 15px; border: 2px solid #444; border-radius: 12px; text-align: left; cursor: pointer; transition: 0.2s; position: relative; }
-        .char-card:active { transform: scale(0.98); }
-        .char-card h3 { font-size: 18px; margin-bottom: 4px; }
-        .char-card p { font-size: 10px; color: #bbb; line-height: 1.2; }
-
-        #ui { position: absolute; top: 20px; width: 100%; display: none; justify-content: space-around; z-index: 10; pointer-events: none; }
-        .score-card { border: 2px solid #00ff00; padding: 8px 20px; border-radius: 10px; background: rgba(0,0,0,0.8); font-size: 22px; }
-        #notif { position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); display: none; font-size: 28px; font-weight: bold; z-index: 2000; text-align: center; color: #fff; text-shadow: 0 0 10px #000; }
-        
+        canvas { display: none; touch-action: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; }
+        #menu, #char-select { position: absolute; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5000; }
+        #char-select { display: none; background: #000; overflow-y: auto; padding: 20px 0; }
+        h1 { font-size: 38px; color: #00ff00; text-shadow: 0 0 15px #00ff00; margin-bottom: 5px; }
+        .instr { font-size: 11px; margin-bottom: 20px; color: #888; letter-spacing: 1px; }
+        .btn { width: 260px; padding: 15px; margin: 8px; border: 2px solid #00ff00; background: rgba(0,255,0,0.1); color: #00ff00; font-weight: bold; cursor: pointer; border-radius: 12px; text-transform: uppercase; }
+        .char-grid { display: grid; grid-template-columns: 1fr; gap: 8px; width: 90%; max-width: 350px; }
+        .char-card { padding: 12px; border: 2px solid #333; border-radius: 10px; cursor: pointer; background: #111; }
+        #ui { position: absolute; top: 15px; width: 100%; display: none; justify-content: center; z-index: 10; pointer-events: none; }
+        .score-card { border: 2px solid #00ff00; padding: 5px 20px; border-radius: 8px; background: rgba(0,0,0,0.9); font-size: 20px; color: #0f0; }
+        #notif { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); display: none; font-size: 30px; font-weight: bold; z-index: 2000; text-align: center; color: #fff; }
         #controls { display: none; }
-        #joyBase { position: absolute; bottom: 40px; left: 30px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border: 2px solid #00ff00; border-radius: 50%; z-index: 100; touch-action: none; }
-        #joyKnob { position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; background: #00ff00; border-radius: 50%; opacity: 0.7; }
-        #fireBtn { position: absolute; bottom: 40px; right: 30px; width: 100px; height: 100px; border-radius: 50%; background: rgba(0, 255, 0, 0.2); border: 4px solid #00ff00; color: #00ff00; display: flex; justify-content: center; align-items: center; font-weight: bold; z-index: 100; touch-action: none; }
+        #joyBase { position: absolute; bottom: 40px; left: 30px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #0f0; border-radius: 50%; z-index: 100; touch-action: none; }
+        #joyKnob { position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; background: #0f0; border-radius: 50%; pointer-events: none; }
+        #fireBtn { position: absolute; bottom: 40px; right: 30px; width: 90px; height: 90px; border-radius: 50%; background: rgba(0,255,0,0.2); border: 4px solid #0f0; color: #0f0; display: flex; justify-content: center; align-items: center; font-weight: bold; z-index: 100; touch-action: none; }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        <div class="score-card"><span id="pScore" style="color:#0ff">0</span> - <span id="eScore" style="color:#f00">0</span></div>
-    </div>
-
+    <div id="ui"><div class="score-card"><span id="pScore">0</span> - <span id="eScore">0</span></div></div>
     <div id="notif">POINT!</div>
 
     <div id="menu">
-        <h1>HELEN WAR</h1>
-        <p class="instr">TACTICAL CLASS COMBAT</p>
+        <h1>RIKA WAR</h1>
+        <p class="instr">CLASS-BASED PORTRAIT COMBAT</p>
         <button class="btn" onclick="showCharSelect('ai')">OFFLINE VS AI</button>
         <button class="btn" onclick="showOnlineMenu()">ONLINE VS FRIEND</button>
-        <div id="online-setup" style="display:none; text-align: center;">
-            <input type="text" id="join-id" style="padding:10px; margin:10px; background:#111; border:1px solid #0f0; color:#fff; text-align:center;" placeholder="PASTE ID">
-            <button class="btn" style="width:120px;" onclick="connectToFriend()">JOIN</button>
-            <p id="my-id" style="font-size:10px; color:#666; margin-top:10px;">PEER: CONNECTING...</p>
+        <div id="online-setup" style="display:none; margin-top:10px;">
+            <input type="text" id="join-id" style="padding:10px; background:#111; border:1px solid #0f0; color:#fff; text-align:center;" placeholder="PASTE ID">
+            <button class="btn" style="width:100px; padding:10px;" onclick="connectToFriend()">JOIN</button>
+            <p id="my-id" style="font-size:9px; color:#444; margin-top:5px;">CONNECTING...</p>
         </div>
     </div>
 
     <div id="char-select">
-        <h1>SELECT CLASS</h1>
+        <h1 style="margin-bottom:15px;">SELECT CLASS</h1>
         <div class="char-grid">
-            <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0">
-                <h3 style="color:#0f0">SCOUT</h3>
-                <p>HP: 1 | SPEED: 8.5 | RELOAD: FAST</p>
-            </div>
-            <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af">
-                <h3 style="color:#0af">TANK</h3>
-                <p>HP: 4 | SPEED: 3.5 | HEAVY ARMOR</p>
-            </div>
-            <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44">
-                <h3 style="color:#f44">GHOST</h3>
-                <p>HP: 1 | SPEED: 6.5 | 3-ROUND BURST</p>
-            </div>
-            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#a0f">
-                <h3 style="color:#a0f">SNIPER</h3>
-                <p>HP: 1 | SPEED: 5.5 | ULTRA-FAST BULLET</p>
-            </div>
-            <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80">
-                <h3 style="color:#f80">HEAVY</h3>
-                <p>HP: 2 | SPEED: 5.0 | MASSIVE ROUNDS</p>
-            </div>
+            <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0"><h3 style="color:#0f0">HANUM</h3><p>SPEED: 5.5 | HP: 1</p></div>
+            <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af"><h3 style="color:#0af">RIKA</h3><p>SPEED: 2.2 | HP: 4</p></div>
+            <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44"><h3 style="color:#f44">SATRI</h3><p>SPEED: 4.2 | HP: 1</p></div>
+            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#a0f"><h3 style="color:#a0f">IKA BINAL</h3><p>SPEED: 3.5 | HP: 1</p></div>
+            <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80"><h3 style="color:#f80">HELEN</h3><p>SPEED: 3.2 | HP: 2</p></div>
         </div>
     </div>
 
@@ -97,11 +70,11 @@
     let pScore = 0, eScore = 0;
 
     const CLASSES = {
-        scout:  { speed: 8.5, bSpeed: 13, bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
-        tank:   { speed: 3.5, bSpeed: 9,  bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
-        ghost:  { speed: 6.5, bSpeed: 11, bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
-        sniper: { speed: 5.5, bSpeed: 18, bSize: 5,  hp: 1, color: '#a0f', reload: 3000, burst: 1 },
-        heavy:  { speed: 5.0, bSpeed: 10, bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
+        scout:  { speed: 5.5, bSpeed: 10, bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
+        tank:   { speed: 2.2, bSpeed: 6.5, bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
+        ghost:  { speed: 4.2, bSpeed: 8, bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
+        sniper: { speed: 3.5, bSpeed: 15, bSize: 5,  hp: 1, color: '#a0f', reload: 3000, burst: 1 },
+        heavy:  { speed: 3.2, bSpeed: 7.5, bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
     };
 
     let player = { x: 0, y: 0, r: 25, angle: 0, class: 'scout', currentHp: 1, lastShot: 0 };
@@ -114,6 +87,11 @@
     function showOnlineMenu() { document.getElementById('online-setup').style.display = 'block'; }
     function showCharSelect(m) { mode = m; document.getElementById('menu').style.display = 'none'; document.getElementById('char-select').style.display = 'flex'; }
 
+    function goFullScreen() {
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+        else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
+    }
+
     function connectToFriend() {
         const id = document.getElementById('join-id').value;
         if(!id) return;
@@ -123,16 +101,17 @@
     }
 
     function selectChar(type) {
+        goFullScreen();
         player.class = type;
         Object.assign(player, CLASSES[type]);
         player.currentHp = player.hp;
         document.getElementById('char-select').style.display = 'none';
-
-        if (mode === "guest") {
-            conn.send({type: 'init', char: type});
-            setupRemote();
-        } else if (mode === "host") {
-            setupRemote();
+        
+        if (mode === "guest") { 
+            conn.send({type: 'init', char: type}); 
+            setupRemote(); 
+        } else if (mode === "host") { 
+            setupRemote(); 
         } else {
             let keys = Object.keys(CLASSES);
             enemy.class = keys[Math.floor(Math.random()*keys.length)];
@@ -145,9 +124,7 @@
     function setupRemote() {
         conn.on('data', data => {
             if(data.type === 'init') { 
-                enemy.class = data.char; 
-                Object.assign(enemy, CLASSES[data.char]); 
-                enemy.currentHp = enemy.hp;
+                enemy.class = data.char; Object.assign(enemy, CLASSES[data.char]); enemy.currentHp = enemy.hp;
                 if(mode === "host") {
                     conn.send({type: 'init', char: player.class});
                     walls = generateWalls();
@@ -156,21 +133,20 @@
                 }
             }
             if(data.type === 'sync') { enemy.targetX = data.x; enemy.targetY = data.y; enemy.targetAngle = data.angle; }
-            if(data.type === 'fire') { fire(enemy, data.angle, false); }
+            if(data.type === 'fire') { spawnBullet(enemy, data.angle); }
             if(data.type === 'walls') { walls = data.walls; startGame(); }
-            if(data.type === 'hit') { 
-                if(data.target === 'player') player.currentHp--; else enemy.currentHp--;
-                checkDeaths();
-            }
+            if(data.type === 'hit') { if(data.target === 'player') player.currentHp--; else enemy.currentHp--; checkDeaths(); }
         });
     }
 
     function startGame() {
+        if (mode !== "guest" && walls.length === 0) walls = generateWalls();
         resize();
         document.getElementById('ui').style.display = 'flex';
         document.getElementById('controls').style.display = 'block';
         resetRound();
-        gameActive = true; loop();
+        gameActive = true; 
+        loop();
     }
 
     function resize() {
@@ -179,25 +155,16 @@
         canvas.style.display = 'block';
     }
 
-    // ORIGINAL WALL GENERATION LOGIC
     function generateWalls() {
-        let t = 15; // Border thickness
-        let arr = [
-            {x:0, y:0, w:V_WIDTH, h:t}, // Top
-            {x:0, y:V_HEIGHT-t, w:V_WIDTH, h:t}, // Bottom
-            {x:0, y:0, w:t, h:V_HEIGHT}, // Left
-            {x:V_WIDTH-t, y:0, w:t, h:V_HEIGHT} // Right
-        ];
-        
-        const wallCount = 6 + Math.floor(Math.random()*4);
-        for(let i=0; i < wallCount; i++) {
+        const t = 20;
+        let arr = [{x:0, y:0, w:V_WIDTH, h:t}, {x:0, y:V_HEIGHT-t, w:V_WIDTH, h:t}, {x:0, y:0, w:t, h:V_HEIGHT}, {x:V_WIDTH-t, y:0, w:t, h:V_HEIGHT}];
+        for(let i=0; i<8; i++) {
             let isV = Math.random() > 0.5;
-            let ww = isV ? 20 : 120 + Math.random()*150;
-            let hh = isV ? 120 + Math.random()*150 : 20;
-            let wx = 100 + Math.random()*(V_WIDTH-300);
-            let wy = 200 + Math.random()*(V_HEIGHT-500);
-            // Safety: Don't spawn walls exactly on start corners
-            if ((wx < 200 && wy < 200) || (wx > V_WIDTH-200 && wy > V_HEIGHT-200)) continue;
+            let ww = isV ? 25 : 120 + Math.random()*150;
+            let hh = isV ? 120 + Math.random()*150 : 25;
+            let wx = 100 + Math.random() * (V_WIDTH-300);
+            let wy = 200 + Math.random() * (V_HEIGHT-500);
+            if ((wx < 180 && wy < 180) || (wx > V_WIDTH-250 && wy > V_HEIGHT-250)) continue;
             arr.push({x:wx, y:wy, w:ww, h:hh});
         }
         return arr;
@@ -205,107 +172,98 @@
 
     function resetRound() {
         const p = 120;
-        if(mode === "guest") {
-            player.x = V_WIDTH-p; player.y = V_HEIGHT-p;
-            enemy.x = enemy.targetX = p; enemy.y = enemy.targetY = p;
-        } else {
-            player.x = p; player.y = p;
-            enemy.x = enemy.targetX = V_WIDTH-p; enemy.y = enemy.targetY = V_HEIGHT-p;
-        }
+        player.x = (mode === "guest") ? V_WIDTH-p : p;
+        player.y = (mode === "guest") ? V_HEIGHT-p : p;
+        enemy.x = enemy.targetX = (mode === "guest") ? p : V_WIDTH-p;
+        enemy.y = enemy.targetY = (mode === "guest") ? p : V_HEIGHT-p;
+        player.currentHp = player.hp; enemy.currentHp = enemy.hp;
         bullets = []; isPaused = false;
     }
 
-    function fire(owner, angle, send = true) {
+    function fire(owner, angle) {
         if(Date.now() - owner.lastShot < owner.reload) return;
         owner.lastShot = Date.now();
-        
-        for(let i=0; i<owner.burst; i++) {
-            setTimeout(() => {
-                bullets.push({ 
-                    x: owner.x + Math.cos(angle)*40, y: owner.y + Math.sin(angle)*40, 
-                    vx: Math.cos(angle)*owner.bSpeed, vy: Math.sin(angle)*owner.bSpeed, 
-                    r: owner.bSize, color: owner.color, owner: owner 
-                });
-            }, i * 140);
-        }
-        if(send && conn) conn.send({type:'fire', angle: angle});
+        for(let i=0; i<owner.burst; i++) setTimeout(() => spawnBullet(owner, angle), i * 160);
+        if(owner === player && conn) conn.send({type:'fire', angle: angle});
+    }
+
+    function spawnBullet(owner, angle) {
+        bullets.push({ x: owner.x + Math.cos(angle)*40, y: owner.y + Math.sin(angle)*40, vx: Math.cos(angle)*owner.bSpeed, vy: Math.sin(angle)*owner.bSpeed, r: owner.bSize, color: owner.color, owner: owner });
     }
 
     function update() {
         if(!gameActive || isPaused) return;
-        
+
+        // Player Move + Collision
         let nx = player.x + stick.x * player.speed, ny = player.y + stick.y * player.speed;
         if(!checkWall(player, nx, player.y)) player.x = nx;
         if(!checkWall(player, player.x, ny)) player.y = ny;
         if(conn) conn.send({type:'sync', x:player.x, y:player.y, angle:player.angle});
 
-        if(mode !== "ai") {
-            enemy.x += (enemy.targetX - enemy.x) * 0.25; enemy.y += (enemy.targetY - enemy.y) * 0.25;
-        } else {
+        // Enemy Logic
+        if(mode === "ai") {
             let dx = player.x - enemy.x, dy = player.y - enemy.y, d = Math.hypot(dx,dy);
-            if(d > 350) { 
-                let mx = (dx/d)*enemy.speed, my = (dy/d)*enemy.speed;
-                if(!checkWall(enemy, enemy.x + mx, enemy.y)) enemy.x += mx;
-                if(!checkWall(enemy, enemy.x, enemy.y + my)) enemy.y += my;
-            }
             enemy.angle = Math.atan2(dy, dx);
-            if(d < 850) fire(enemy, enemy.angle, false);
+            
+            if(d > 350) { 
+                // AI Move + Collision (Fix applied here)
+                let amx = (dx/d)*(enemy.speed*0.8), amy = (dy/d)*(enemy.speed*0.8);
+                let anx = enemy.x + amx, any = enemy.y + amy;
+                if(!checkWall(enemy, anx, enemy.y)) enemy.x = anx;
+                if(!checkWall(enemy, enemy.x, any)) enemy.y = any;
+            }
+            if(d < 850) fire(enemy, enemy.angle);
+        } else {
+            enemy.x += (enemy.targetX - enemy.x) * 0.15; 
+            enemy.y += (enemy.targetY - enemy.y) * 0.15;
         }
 
+        // Bullets
         for(let i=bullets.length-1; i>=0; i--) {
             let b = bullets[i]; b.x += b.vx; b.y += b.vy;
             if(b.x<0||b.x>V_WIDTH||b.y<0||b.y>V_HEIGHT) { bullets.splice(i,1); continue; }
-            
-            let hitWall = false;
-            for(let w of walls) { if(b.x>w.x && b.x<w.x+w.w && b.y>w.y && b.y<w.y+w.h) { hitWall = true; break; } }
-            if(hitWall) { bullets.splice(i,1); continue; }
-            
+            let hitW = false;
+            for(let w of walls) { if(b.x>w.x && b.x<w.x+w.w && b.y>w.y && b.y<w.y+w.h) { hitW = true; break; } }
+            if(hitW) { bullets.splice(i,1); continue; }
             if(b.owner !== player && Math.hypot(b.x-player.x, b.y-player.y) < player.r) {
-                bullets.splice(i,1); player.currentHp--; 
-                if(conn) conn.send({type:'hit', target:'player'});
-                checkDeaths();
+                bullets.splice(i,1); player.currentHp--; if(conn) conn.send({type:'hit', target:'player'}); checkDeaths();
             } else if(b.owner !== enemy && Math.hypot(b.x-enemy.x, b.y-enemy.y) < enemy.r) {
-                bullets.splice(i,1); enemy.currentHp--;
-                if(conn) conn.send({type:'hit', target:'enemy'});
-                checkDeaths();
+                bullets.splice(i,1); enemy.currentHp--; if(conn) conn.send({type:'hit', target:'enemy'}); checkDeaths();
             }
         }
     }
 
     function checkDeaths() {
         if(isPaused) return;
-        if(player.currentHp <= 0) { eScore++; finishRound("ELIMINATED"); }
+        if(player.currentHp <= 0) { eScore++; finishRound("MISSION FAILED"); }
         else if(enemy.currentHp <= 0) { pScore++; finishRound("VICTORY"); }
         document.getElementById('pScore').innerText = pScore; document.getElementById('eScore').innerText = eScore;
     }
 
     function finishRound(txt) {
         isPaused = true; const n = document.getElementById('notif'); n.innerText = txt; n.style.display = 'block';
-        setTimeout(() => { n.style.display = 'none'; resetRound(); }, 2000);
+        setTimeout(() => { 
+            n.style.display = 'none'; 
+            if(mode !== "guest") { 
+                walls = generateWalls(); 
+                if(conn) conn.send({type:'walls', walls: walls}); 
+            } 
+            resetRound(); 
+        }, 2000);
     }
 
-    function checkWall(o, nx, ny) { 
-        for(let w of walls) if(nx+o.r>w.x && nx-o.r<w.x+w.w && ny+o.r>w.y && ny-o.r<w.y+w.h) return true; 
-        return false; 
-    }
+    function checkWall(o, nx, ny) { for(let w of walls) if(nx+o.r>w.x && nx-o.r<w.x+w.w && ny+o.r>w.y && ny-o.r<w.y+w.h) return true; return false; }
 
     function draw() {
-        ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.scale(scale, scale);
-        
-        // WALL RENDERING WITH NEON GLOW
-        ctx.shadowBlur = 10; ctx.shadowColor = "#0ff";
-        ctx.strokeStyle = "#0ff"; ctx.lineWidth = 4;
-        walls.forEach(w => ctx.strokeRect(w.x, w.y, w.w, w.h));
-        ctx.shadowBlur = 0;
-        
+        ctx.fillStyle = "#0ff";
+        walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
         [player, enemy].forEach(c => {
             ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.angle);
             ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(0,0,c.r,0,Math.PI*2); ctx.fill();
-            for(let i=0; i<c.hp; i++) {
-                ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333";
-                ctx.fillRect(-20 + i*12, 12, 8, 8);
-            }
+            for(let i=0; i<c.hp; i++) { ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333"; ctx.fillRect(-22 + i*12, 14, 8, 8); }
             ctx.restore();
         });
         bullets.forEach(b => { ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); });
@@ -324,6 +282,7 @@
     }, {passive: false});
     window.addEventListener('touchend', () => { stick.active=false; stick.x=0; stick.y=0; document.getElementById('joyKnob').style.transform=`translate(0,0)`; });
     document.getElementById('fireBtn').addEventListener('touchstart', e => { e.preventDefault(); fire(player, player.angle); });
+    window.addEventListener('resize', resize);
 </script>
 </body>
 </html>
