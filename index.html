@@ -41,7 +41,6 @@
         
         #notif { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); display: none; font-size: 30px; font-weight: bold; z-index: 2000; text-align: center; color: #fff; }
 
-        #controls { display: none; }
         #joyBase { position: absolute; bottom: 40px; left: 30px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #0f0; border-radius: 50%; z-index: 100; touch-action: none; }
         #joyKnob { position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; background: #0f0; border-radius: 50%; pointer-events: none; }
         #fireBtn { position: absolute; bottom: 40px; right: 30px; width: 90px; height: 90px; border-radius: 50%; background: rgba(0,255,0,0.2); border: 4px solid #0f0; color: #0f0; display: flex; justify-content: center; align-items: center; font-weight: bold; z-index: 100; touch-action: none; }
@@ -101,11 +100,12 @@
     let pScore = 0, eScore = 0;
 
     const CLASSES = {
-        scout:  { speed: 5.5, bSpeed: 10, bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
-        tank:   { speed: 2.2, bSpeed: 6.5, bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
-        ghost:  { speed: 4.2, bSpeed: 8, bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
-        sniper: { speed: 3.5, bSpeed: 15, bSize: 6,  hp: 1, color: '#ff00ff', reload: 3000, burst: 1 },
-        heavy:  { speed: 3.2, bSpeed: 7.5, bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
+        // Bullet speeds reduced by 30%
+        scout:  { speed: 5.5, bSpeed: 7,    bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
+        tank:   { speed: 2.2, bSpeed: 4.5,  bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
+        ghost:  { speed: 4.2, bSpeed: 5.6,  bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
+        sniper: { speed: 3.5, bSpeed: 10.5, bSize: 6,  hp: 1, color: '#ff00ff', reload: 3000, burst: 1 },
+        heavy:  { speed: 3.2, bSpeed: 5.2,  bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
     };
 
     let player = { x: 0, y: 0, r: 25, angle: 0, class: 'scout', currentHp: 1, lastShot: 0 };
@@ -132,6 +132,14 @@
         mode = m;
         document.getElementById('menu').style.display = 'none';
         document.getElementById('char-select').style.display = 'flex';
+    }
+
+    function connectToFriend() {
+        const id = document.getElementById('join-id').value;
+        if(!id) return alert("Enter Friend ID!");
+        conn = peer.connect(id);
+        mode = "guest";
+        showCharSelect('guest');
     }
 
     function selectChar(type) {
@@ -276,18 +284,14 @@
             if(b.x - b.r < 0 || b.x + b.r > V_WIDTH) b.vx *= -1;
             if(b.y - b.r < 0 || b.y + b.r > V_HEIGHT) b.vy *= -1;
 
-            // Updated Hit Detection: Friendly Fire Enabled
-            // Added 150ms "Safety Buffer" so bullets don't hit the shooter immediately upon firing.
             let safetyBuffer = now - b.spawnTime > 150;
 
-            // Check hit on Player
             if ((b.owner !== player || safetyBuffer) && Math.hypot(b.x - player.x, b.y - player.y) < player.r + b.r) {
                 bullets.splice(i, 1);
                 player.currentHp--;
                 if (conn) conn.send({ type: 'hit', target: 'player' });
                 checkDeaths();
             } 
-            // Check hit on Enemy
             else if ((b.owner !== enemy || safetyBuffer) && Math.hypot(b.x - enemy.x, b.y - enemy.y) < enemy.r + b.r) {
                 bullets.splice(i, 1);
                 enemy.currentHp--;
