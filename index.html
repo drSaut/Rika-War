@@ -10,76 +10,91 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: #fff; }
         canvas { display: none; touch-action: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; }
         
-        #menu, #char-select { 
+        #menu, #char-select, #how-to-play { 
             position: absolute; 
-            width: 100%; 
-            height: 100%; 
-            background: #000; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center;
-            z-index: 5000; 
+            width: 100%; height: 100%; background: #000; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            text-align: center; z-index: 5000; 
         }
         
         #char-select { display: none; overflow-y: auto; padding: 20px 0; }
-        
-        h1 { font-size: 38px; color: #00ff00; text-shadow: 0 0 15px #00ff00; margin-bottom: 5px; width: 100%; }
-        .instr { font-size: 11px; margin-bottom: 20px; color: #888; letter-spacing: 1px; width: 100%; }
+        #how-to-play { display: none; background: rgba(0,0,0,0.95); z-index: 6000; padding: 20px; }
+
+        h1 { font-size: 32px; color: #00ff00; text-shadow: 0 0 15px #00ff00; margin-bottom: 5px; }
         
         .btn-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
-        .btn { width: 260px; padding: 15px; margin: 8px; border: 2px solid #00ff00; background: rgba(0,255,0,0.1); color: #00ff00; font-weight: bold; cursor: pointer; border-radius: 12px; text-transform: uppercase; font-size: 14px; }
-        .btn-wa { border-color: #25D366; color: #25D366; font-size: 12px; }
-
+        .btn { width: 260px; padding: 15px; margin: 8px; border: 2px solid #00ff00; background: rgba(0,255,0,0.1); color: #00ff00; font-weight: bold; cursor: pointer; border-radius: 12px; text-transform: uppercase; }
+        
         .char-grid { display: grid; grid-template-columns: 1fr; gap: 8px; width: 90%; max-width: 350px; }
         .char-card { padding: 12px; border: 2px solid #333; border-radius: 10px; cursor: pointer; background: #111; text-align: left; }
-        .char-card h3 { font-size: 16px; margin-bottom: 2px; }
+
+        /* SPLASH SCREEN STYLES */
+        .guide-container { width: 90%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
+        .player-demo { position: relative; width: 120px; height: 120px; background: #0af; border-radius: 50%; margin: 30px 0; }
+        .demo-eye { position: absolute; right: 10px; top: 35px; width: 30px; height: 30px; background: #fff; border-radius: 50%; border: 3px solid #000; }
+        .demo-tail { position: absolute; left: 10px; top: 50px; width: 15px; height: 15px; background: #fff; border-radius: 50%; }
+        .demo-hp { position: absolute; left: -35px; top: 25px; display: flex; flex-direction: column; gap: 4px; }
+        .hp-box { width: 15px; height: 15px; background: #fff; border: 1px solid #333; }
+        .label { position: absolute; font-size: 9px; background: #0f0; color: #000; padding: 2px 5px; font-weight: bold; border-radius: 4px; white-space: nowrap; }
+        .joy-demo { width: 60px; height: 60px; border: 2px solid #0f0; border-radius: 50%; position: relative; margin-top: 10px; }
+        .joy-knob-demo { position: absolute; top: 15px; left: 30px; width: 25px; height: 25px; background: #0f0; border-radius: 50%; }
 
         #ui { position: absolute; top: 15px; width: 100%; display: none; justify-content: center; z-index: 10; pointer-events: none; }
         .score-card { border: 2px solid #00ff00; padding: 5px 20px; border-radius: 8px; background: rgba(0,0,0,0.9); font-size: 20px; color: #0f0; }
         
-        #notif { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); display: none; font-size: 30px; font-weight: bold; z-index: 2000; text-align: center; color: #fff; }
-
+        #controls { display: none; }
         #joyBase { position: absolute; bottom: 40px; left: 30px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border: 2px solid #0f0; border-radius: 50%; z-index: 100; touch-action: none; }
         #joyKnob { position: absolute; top: 30px; left: 30px; width: 40px; height: 40px; background: #0f0; border-radius: 50%; pointer-events: none; }
         #fireBtn { position: absolute; bottom: 40px; right: 30px; width: 90px; height: 90px; border-radius: 50%; background: rgba(0,255,0,0.2); border: 4px solid #0f0; color: #0f0; display: flex; justify-content: center; align-items: center; font-weight: bold; z-index: 100; touch-action: none; }
-        
         input { padding: 12px; margin: 10px; background: #111; border: 1px solid #0f0; color: #fff; text-align: center; border-radius: 8px; width: 220px; }
     </style>
 </head>
 <body>
 
+    <div id="how-to-play">
+        <h1>HOW TO PLAY</h1>
+        <div class="guide-container">
+            <div class="player-demo">
+                <div class="demo-eye"></div><div class="demo-tail"></div>
+                <div class="demo-hp"><div class="hp-box"></div><div class="hp-box"></div><div class="hp-box"></div></div>
+                <div class="label" style="top:-20px; left:30px;">BLUE PLAYER (RIKA)</div>
+                <div class="label" style="right:-70px; top:40px;">FRONT (EYES)</div>
+                <div class="label" style="left:-75px; top:5px;">LIVE DOTS</div>
+                <div class="label" style="left:0; bottom:-15px;">TAIL (BACK)</div>
+            </div>
+            <p style="color:#0f0; margin-top:10px;">CONTROLS</p>
+            <div class="joy-demo"><div class="joy-knob-demo"></div></div>
+            <p style="font-size:11px; color:#888; margin:10px;">MOVE JOYSTICK TO WALK.<br>YOU AUTOMATICALLY FACE THE DIRECTION YOU MOVE.</p>
+            <button class="btn" onclick="closeSplash()">START BATTLE!</button>
+        </div>
+    </div>
+
     <div id="ui"><div class="score-card"><span id="pScore">0</span> - <span id="eScore">0</span></div></div>
-    <div id="notif">POINT!</div>
+    <div id="notif" style="position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); display:none; font-size:30px; z-index:2000;">POINT!</div>
 
     <div id="menu">
         <h1>RIKA WAR</h1>
-        <p class="instr">PERTEMPURAN DEMI GORENGAN KUBURAN YANG BERMINYAK KALI</p>
         <div class="btn-container" id="main-btns">
             <button class="btn" onclick="showCharSelect('ai')">OFFLINE VS AI</button>
             <button class="btn" onclick="showOnlineMenu()">ONLINE VS FRIEND</button>
         </div>
-        
         <div class="btn-container" id="online-setup" style="display:none;">
-            <p id="my-id-display" style="color:#0f0; font-size:12px; margin-bottom:10px;">GENERATING ID...</p>
-            <button class="btn btn-wa" onclick="shareWA()">SHARE ID TO WHATSAPP</button>
-            <button class="btn" style="font-size:11px; height:40px; padding:5px;" onclick="copyID()">COPY ID TO CLIPBOARD</button>
-            <hr style="width:80%; border:0; border-top:1px solid #333; margin:15px auto;">
+            <p id="my-id-display" style="color:#0f0; font-size:12px; margin-bottom:10px;">ID: ...</p>
+            <button class="btn" onclick="shareWA()">SHARE ID</button>
             <input type="text" id="join-id" placeholder="PASTE FRIEND ID">
             <button class="btn" onclick="connectToFriend()">JOIN DUEL</button>
-            <button class="btn" style="border-color:#555; color:#555;" onclick="location.reload()">BACK</button>
+            <button class="btn" style="border-color:#555;" onclick="location.reload()">BACK</button>
         </div>
     </div>
 
     <div id="char-select">
-        <h1>PILIH TIM LEMBUR</h1>
+        <h1>SELECT CHARACTER</h1>
         <div class="char-grid">
-            <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0"><h3 style="color:#0f0">HANUM</h3><p>SPEED: CEPAT | CEPAT CAPAI</p></div>
-            <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af"><h3 style="color:#0af">RIKA</h3><p>SPEED: LAMBAT | TENAGA BADAK</p></div>
-            <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44"><h3 style="color:#f44">SATRI</h3><p>SPEED: GHOST | CEPAT HILANG KEKAMPUS</p></div>
-            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#ff00ff"><h3 style="color:#ff00ff">IKA BINAL</h3><p>SPEED: MEDIUM | CEPAT KEDAPUR</p></div>
-            <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80"><h3 style="color:#f80">HELEN</h3><p>SPEED: BERAT | TENAGA NMAX</p></div>
+            <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0"><h3 style="color:#0f0">HANUM</h3><p>FAST | 1 HP</p></div>
+            <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af"><h3 style="color:#0af">RIKA</h3><p>SLOW | 4 HP</p></div>
+            <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44"><h3 style="color:#f44">SATRI</h3><p>GHOST | 1 HP</p></div>
+            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#ff00ff"><h3 style="color:#ff00ff">IKA BINAL</h3><p>SNIPER | 1 HP</p></div>
+            <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80"><h3 style="color:#f80">HELEN</h3><p>HEAVY | 2 HP</p></div>
         </div>
     </div>
 
@@ -100,11 +115,11 @@
     let pScore = 0, eScore = 0;
 
     const CLASSES = {
-        scout:  { speed: 3.8, bSpeed: 2.5,  bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
-        tank:   { speed: 1.5, bSpeed: 1.6,  bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
-        ghost:  { speed: 2.9, bSpeed: 2.0,  bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
-        sniper: { speed: 2.4, bSpeed: 3.7,  bSize: 6,  hp: 1, color: '#ff00ff', reload: 3000, burst: 1 },
-        heavy:  { speed: 2.2, bSpeed: 1.8,  bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
+        scout:  { speed: 3.8, bSpeed: 2.5, bSize: 6, hp: 1, color: '#0f0', reload: 1400, burst: 1 },
+        tank:   { speed: 1.5, bSpeed: 1.6, bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
+        ghost:  { speed: 2.9, bSpeed: 2.0, bSize: 7, hp: 1, color: '#f44', reload: 3200, burst: 3 },
+        sniper: { speed: 2.4, bSpeed: 3.7, bSize: 6, hp: 1, color: '#ff00ff', reload: 3000, burst: 1 },
+        heavy:  { speed: 2.2, bSpeed: 1.8, bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
     };
 
     let player = { x: 0, y: 0, r: 35, angle: 0, class: 'scout', currentHp: 1, lastShot: 0 };
@@ -112,7 +127,12 @@
     let bullets = [], walls = [], particles = [], stick = { x: 0, y: 0, active: false };
 
     peer.on('open', id => { document.getElementById('my-id-display').innerText = "YOUR ID: " + id; });
-    peer.on('connection', c => { conn = c; mode = "host"; showCharSelect('host'); });
+    peer.on('connection', c => { 
+        conn = c; 
+        mode = "host"; 
+        showCharSelect('host'); 
+        setupRemote(); // Ensure host is listening immediately
+    });
 
     function showOnlineMenu() {
         document.getElementById('main-btns').style.display = 'none';
@@ -120,11 +140,8 @@
     }
 
     function shareWA() {
-        const id = peer.id; if(!id) return alert("Peer ID not ready!");
-        window.open(`https://wa.me/?text=Duel%20me%20in%20Rika%20War!%20My%20ID:%20${id}`, '_blank');
+        window.open(`https://wa.me/?text=Duel%20me!%20ID:%20${peer.id}`, '_blank');
     }
-
-    function copyID() { navigator.clipboard.writeText(peer.id).then(() => alert("ID Copied!")); }
 
     function showCharSelect(m) {
         mode = m;
@@ -134,19 +151,25 @@
 
     function connectToFriend() {
         const id = document.getElementById('join-id').value;
-        if(!id) return alert("Enter Friend ID!");
-        conn = peer.connect(id); mode = "guest"; showCharSelect('guest');
+        if(!id) return alert("Paste ID first!");
+        conn = peer.connect(id);
+        mode = "guest";
+        showCharSelect('guest');
+        setupRemote(); // Ensure guest is listening immediately
     }
 
     function selectChar(type) {
-        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
         player.class = type; Object.assign(player, CLASSES[type]); player.currentHp = player.hp;
         document.getElementById('char-select').style.display = 'none';
-        
+        document.getElementById('how-to-play').style.display = 'flex';
+    }
+
+    function closeSplash() {
+        document.getElementById('how-to-play').style.display = 'none';
         if (mode === "guest") { 
-            conn.send({type: 'init', char: type}); setupRemote(); 
+            conn.send({type: 'init', char: player.class}); 
         } else if (mode === "host") { 
-            setupRemote(); 
+            // Wait for guest init
         } else {
             let keys = Object.keys(CLASSES);
             enemy.class = keys[Math.floor(Math.random()*keys.length)];
@@ -156,28 +179,31 @@
     }
 
     function setupRemote() {
+        conn.on('open', () => { console.log("Connected!"); });
         conn.on('data', data => {
             if(data.type === 'init') { 
                 enemy.class = data.char; Object.assign(enemy, CLASSES[data.char]); enemy.currentHp = enemy.hp;
                 if(mode === "host") {
                     conn.send({type: 'init', char: player.class});
-                    walls = generateWalls(); conn.send({type:'walls', walls: walls});
+                    walls = generateWalls();
+                    conn.send({type:'walls', walls: walls});
                     startGame();
                 }
             }
+            if(data.type === 'walls') { walls = data.walls; startGame(); }
             if(data.type === 'sync') { enemy.targetX = data.x; enemy.targetY = data.y; enemy.targetAngle = data.angle; }
             if(data.type === 'fire') { spawnBullet(enemy, data.angle); }
-            if(data.type === 'walls') { walls = data.walls; startGame(); }
             if(data.type === 'hit') { if(data.target === 'player') player.currentHp--; else enemy.currentHp--; checkDeaths(); }
         });
     }
 
     function startGame() {
-        if (mode !== "guest" && walls.length === 0) walls = generateWalls();
         resize();
         document.getElementById('ui').style.display = 'flex';
         document.getElementById('controls').style.display = 'block';
-        resetRound(); gameActive = true; loop();
+        resetRound(); 
+        gameActive = true; 
+        requestAnimationFrame(loop);
     }
 
     function resize() {
@@ -212,165 +238,98 @@
     }
 
     function createExplosion(x, y, color) {
-        for(let i=0; i<30; i++) {
-            particles.push({
-                x: x, y: y,
-                vx: (Math.random() - 0.5) * 15,
-                vy: (Math.random() - 0.5) * 15,
-                r: Math.random() * 8 + 2,
-                life: 1.0,
-                color: color
-            });
+        for(let i=0; i<20; i++) {
+            particles.push({ x: x, y: y, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, r: Math.random()*5, life: 1, color: color });
         }
     }
 
     function fire(owner, angle) {
         if(Date.now() - owner.lastShot < owner.reload) return;
-        if(owner === enemy && mode === "ai" && isWallInFront(owner, angle, 120)) return; 
         owner.lastShot = Date.now();
         for(let i=0; i<owner.burst; i++) setTimeout(() => spawnBullet(owner, angle), i * 160);
         if(owner === player && conn) conn.send({type:'fire', angle: angle});
     }
 
-    function isWallInFront(o, angle, dist) {
-        for(let step = 40; step <= dist; step += 20) {
-            let checkX = o.x + Math.cos(angle) * step;
-            let checkY = o.y + Math.sin(angle) * step;
-            for(let w of walls) if(checkX > w.x && checkX < w.x + w.w && checkY > w.y && checkY < w.y + w.h) return true;
-        }
-        return false;
-    }
-
     function spawnBullet(owner, angle) {
-        let spawnDist = owner.r + 20;
+        let sd = owner.r + 20;
         bullets.push({ 
-            x: owner.x + Math.cos(angle) * spawnDist, y: owner.y + Math.sin(angle) * spawnDist, 
+            x: owner.x + Math.cos(angle)*sd, y: owner.y + Math.sin(angle)*sd, 
             vx: Math.cos(angle)*owner.bSpeed, vy: Math.sin(angle)*owner.bSpeed, 
             r: owner.bSize, color: owner.color, owner: owner, spawnTime: Date.now()
         });
     }
 
     function update() {
-        // Update particles even if round is "paused" (so explosion plays out)
         for(let i=particles.length-1; i>=0; i--) {
-            let p = particles[i];
-            p.x += p.vx; p.y += p.vy;
-            p.life -= 0.02;
-            if(p.life <= 0) particles.splice(i, 1);
+            let p = particles[i]; p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+            if(p.life <= 0) particles.splice(i,1);
         }
-
         if(!gameActive || isPaused) return;
 
         let nx = player.x + stick.x * player.speed, ny = player.y + stick.y * player.speed;
         if(!checkWall(player, nx, player.y)) player.x = nx;
         if(!checkWall(player, player.x, ny)) player.y = ny;
-        if(stick.active && (Math.abs(stick.x) > 0.1 || Math.abs(stick.y) > 0.1)) player.angle = Math.atan2(stick.y, stick.x);
+        if(stick.active) player.angle = Math.atan2(stick.y, stick.x);
         if(conn) conn.send({type:'sync', x:player.x, y:player.y, angle:player.angle});
 
         if(mode === "ai") {
             let dx = player.x - enemy.x, dy = player.y - enemy.y, d = Math.hypot(dx,dy);
             enemy.angle = Math.atan2(dy, dx);
-            if(d > 350) { 
-                let amx = (dx/d)*(enemy.speed*0.8), amy = (dy/d)*(enemy.speed*0.8);
-                if(!checkWall(enemy, enemy.x + amx, enemy.y)) enemy.x += amx;
-                if(!checkWall(enemy, enemy.x, enemy.y + amy)) enemy.y += amy;
-            }
-            if(d < 850) fire(enemy, enemy.angle);
+            if(d > 300) { enemy.x += (dx/d)*enemy.speed*0.7; enemy.y += (dy/d)*enemy.speed*0.7; }
+            if(d < 800) fire(enemy, enemy.angle);
         } else {
-            enemy.x += (enemy.targetX - enemy.x) * 0.15; enemy.y += (enemy.targetY - enemy.y) * 0.15;
+            enemy.x += (enemy.targetX - enemy.x) * 0.1; enemy.y += (enemy.targetY - enemy.y) * 0.1;
             enemy.angle = enemy.targetAngle || 0;
         }
 
         const now = Date.now();
         for(let i=bullets.length-1; i>=0; i--) {
-            let b = bullets[i];
-            if(now - b.spawnTime > 10000) { bullets.splice(i,1); continue; }
-            b.x += b.vx; b.y += b.vy;
-
+            let b = bullets[i]; b.x += b.vx; b.y += b.vy;
+            if(now - b.spawnTime > 5000) { bullets.splice(i,1); continue; }
+            
             for(let w of walls) {
-                if(b.x + b.r > w.x && b.x - b.r < w.x + w.w && b.y + b.r > w.y && b.y - b.r < w.y + w.h) {
-                    let overlapL = (b.x + b.r) - w.x, overlapR = (w.x + w.w) - (b.x - b.r), overlapT = (b.y + b.r) - w.y, overlapB = (w.y + w.h) - (b.y - b.r);
-                    let minOverlap = Math.min(overlapL, overlapR, overlapT, overlapB);
-                    if (minOverlap === overlapL || minOverlap === overlapR) { b.vx *= -1; b.x += (minOverlap === overlapL ? -1 : 1) * 2; } 
-                    else { b.vy *= -1; b.y += (minOverlap === overlapT ? -1 : 1) * 2; }
-                    break; 
-                }
+                if(b.x > w.x && b.x < w.x+w.w && b.y > w.y && b.y < w.y+w.h) { b.vx*=-1; b.vy*=-1; break; }
             }
-            if(b.x - b.r < 0 || b.x + b.r > V_WIDTH) b.vx *= -1;
-            if(b.y - b.r < 0 || b.y + b.r > V_HEIGHT) b.vy *= -1;
 
-            let safetyBuffer = now - b.spawnTime > 250;
-            if ((b.owner !== player || safetyBuffer) && Math.hypot(b.x - player.x, b.y - player.y) < player.r + b.r) {
-                bullets.splice(i, 1); player.currentHp--;
-                if (conn) conn.send({ type: 'hit', target: 'player' });
-                checkDeaths();
-            } 
-            else if ((b.owner !== enemy || safetyBuffer) && Math.hypot(b.x - enemy.x, b.y - enemy.y) < enemy.r + b.r) {
-                bullets.splice(i, 1); enemy.currentHp--;
-                if (conn) conn.send({ type: 'hit', target: 'enemy' });
-                checkDeaths();
+            let safety = now - b.spawnTime > 250;
+            if((b.owner !== player || safety) && Math.hypot(b.x-player.x, b.y-player.y) < player.r) {
+                player.currentHp--; bullets.splice(i,1); checkDeaths(); break;
+            }
+            if((b.owner !== enemy || safety) && Math.hypot(b.x-enemy.x, b.y-enemy.y) < enemy.r) {
+                enemy.currentHp--; bullets.splice(i,1); checkDeaths(); break;
             }
         }
     }
 
     function checkDeaths() {
         if(isPaused) return;
-        if(player.currentHp <= 0) { 
-            eScore++; 
-            createExplosion(player.x, player.y, player.color);
-            finishRound("MISSION FAILED"); 
-        }
-        else if(enemy.currentHp <= 0) { 
-            pScore++; 
-            createExplosion(enemy.x, enemy.y, enemy.color);
-            finishRound("VICTORY"); 
-        }
+        if(player.currentHp <= 0) { eScore++; createExplosion(player.x, player.y, player.color); finishRound("FAILED"); }
+        else if(enemy.currentHp <= 0) { pScore++; createExplosion(enemy.x, enemy.y, enemy.color); finishRound("VICTORY"); }
         document.getElementById('pScore').innerText = pScore; document.getElementById('eScore').innerText = eScore;
     }
 
-    function finishRound(txt) {
-        isPaused = true; const n = document.getElementById('notif'); n.innerText = txt; n.style.display = 'block';
-        setTimeout(() => { 
-            n.style.display = 'none'; 
-            if(mode !== "guest") { walls = generateWalls(); if(conn) conn.send({type:'walls', walls: walls}); } 
-            resetRound(); 
-        }, 2000);
+    function finishRound(t) {
+        isPaused = true; const n = document.getElementById('notif'); n.innerText = t; n.style.display = 'block';
+        setTimeout(() => { n.style.display='none'; resetRound(); }, 2000);
     }
 
     function checkWall(o, nx, ny) { for(let w of walls) if(nx+o.r>w.x && nx-o.r<w.x+w.w && ny+o.r>w.y && ny-o.r<w.y+w.h) return true; return false; }
 
     function draw() {
-        ctx.setTransform(1,0,0,1,0,0);
-        ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.scale(scale, scale);
-        ctx.fillStyle = "#0ff"; walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
+        ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.scale(scale, scale); ctx.fillStyle='#0ff'; walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
 
-        // Draw Characters (Only if not dead during round pause)
         [player, enemy].forEach(c => {
             if(isPaused && c.currentHp <= 0) return;
             ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.angle);
             ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(0,0,c.r,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(c.r - 10, 0, 10, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(c.r - 5, 0, 4, 0, Math.PI*2); ctx.fill();
-            for(let i=0; i<c.hp; i++) { 
-                ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333"; 
-                ctx.fillRect(-c.r - 15, -18 + i*12, 10, 10); 
-            }
-            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-c.r + 5, 0, 6, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(c.r-10, 0, 10, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-c.r+5, 0, 6, 0, Math.PI*2); ctx.fill();
+            for(let i=0; i<c.hp; i++) { ctx.fillStyle = i<c.currentHp ? '#fff' : '#333'; ctx.fillRect(-c.r-15, -18+i*12, 10, 10); }
             ctx.restore();
         });
-        
-        bullets.forEach(b => { 
-            ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); 
-            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 0.4, 0, Math.PI*2); ctx.fill();
-        });
-
-        particles.forEach(p => {
-            ctx.globalAlpha = p.life;
-            ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-            ctx.globalAlpha = 1.0;
-        });
+        bullets.forEach(b => { ctx.fillStyle=b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); });
+        particles.forEach(p => { ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.globalAlpha=1; });
     }
 
     function loop() { update(); draw(); if(gameActive) requestAnimationFrame(loop); }
@@ -384,9 +343,8 @@
         stick.x = dx/40; stick.y = dy/40;
         document.getElementById('joyKnob').style.transform = `translate(${dx}px,${dy}px)`;
     }, {passive: false});
-    window.addEventListener('touchend', () => { stick.active=false; stick.x=0; stick.y=0; document.getElementById('joyKnob').style.transform=`translate(0,0)`; });
+    window.addEventListener('touchend', () => { stick.active=false; stick.x=0; stick.y=0; document.getElementById('joyKnob').style.transform='translate(0,0)'; });
     document.getElementById('fireBtn').addEventListener('touchstart', e => { e.preventDefault(); fire(player, player.angle); });
-    window.addEventListener('resize', resize);
 </script>
 </body>
 </html>
