@@ -10,17 +10,30 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Courier New', monospace; color: #fff; }
         canvas { display: none; touch-action: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #000; }
         
-        #menu, #char-select { position: absolute; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 5000; }
-        #char-select { display: none; background: #000; overflow-y: auto; padding: 20px 0; }
+        #menu, #char-select { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            background: #000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center;
+            z-index: 5000; 
+        }
         
-        h1 { font-size: 38px; color: #00ff00; text-shadow: 0 0 15px #00ff00; margin-bottom: 5px; }
-        .instr { font-size: 11px; margin-bottom: 20px; color: #888; letter-spacing: 1px; }
+        #char-select { display: none; overflow-y: auto; padding: 20px 0; }
         
+        h1 { font-size: 38px; color: #00ff00; text-shadow: 0 0 15px #00ff00; margin-bottom: 5px; width: 100%; }
+        .instr { font-size: 11px; margin-bottom: 20px; color: #888; letter-spacing: 1px; width: 100%; }
+        
+        .btn-container { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .btn { width: 260px; padding: 15px; margin: 8px; border: 2px solid #00ff00; background: rgba(0,255,0,0.1); color: #00ff00; font-weight: bold; cursor: pointer; border-radius: 12px; text-transform: uppercase; font-size: 14px; }
         .btn-wa { border-color: #25D366; color: #25D366; font-size: 12px; }
 
         .char-grid { display: grid; grid-template-columns: 1fr; gap: 8px; width: 90%; max-width: 350px; }
-        .char-card { padding: 12px; border: 2px solid #333; border-radius: 10px; cursor: pointer; background: #111; }
+        .char-card { padding: 12px; border: 2px solid #333; border-radius: 10px; cursor: pointer; background: #111; text-align: left; }
         .char-card h3 { font-size: 16px; margin-bottom: 2px; }
 
         #ui { position: absolute; top: 15px; width: 100%; display: none; justify-content: center; z-index: 10; pointer-events: none; }
@@ -43,13 +56,13 @@
 
     <div id="menu">
         <h1>RIKA WAR</h1>
-        <p class="instr">CLASS-BASED PORTRAIT COMBAT</p>
-        <div id="main-btns">
+        <p class="instr">PERTEMPURAN DEMI GORENGAN KUBURAN YANG BERMINYAK KALI</p>
+        <div class="btn-container" id="main-btns">
             <button class="btn" onclick="showCharSelect('ai')">OFFLINE VS AI</button>
             <button class="btn" onclick="showOnlineMenu()">ONLINE VS FRIEND</button>
         </div>
         
-        <div id="online-setup" style="display:none; text-align:center;">
+        <div class="btn-container" id="online-setup" style="display:none;">
             <p id="my-id-display" style="color:#0f0; font-size:12px; margin-bottom:10px;">GENERATING ID...</p>
             <button class="btn btn-wa" onclick="shareWA()">SHARE ID TO WHATSAPP</button>
             <button class="btn" style="font-size:11px; height:40px; padding:5px;" onclick="copyID()">COPY ID TO CLIPBOARD</button>
@@ -61,13 +74,13 @@
     </div>
 
     <div id="char-select">
-        <h1 style="margin-bottom:15px;">PILIH TIM LEMBUR</h1>
+        <h1>PILIH TIM LEMBUR</h1>
         <div class="char-grid">
-            <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0"><h3 style="color:#0f0">HANUM</h3><p>SPEED:CEPAT LARI| TENAGA CEPAT HABIS</p></div>
-            <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af"><h3 style="color:#0af">RIKA</h3><p>SPEED:TIDAK BISA LARI | TENAGA BADAK</p></div>
-            <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44"><h3 style="color:#f44">SATRI</h3><p>SPEED: CEPAT HILANG| TIBA TIBA DIKAMPUS</p></div>
-            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#a0f"><h3 style="color:#a0f">IKA BINAL</h3><p>SPEED: OK LAH| NDAK ADA HARAPAN</p></div>
-            <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80"><h3 style="color:#f80">HELEN</h3><p>SPEED: YOU KNOW LAH | TENAGA OK</p></div>
+            <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0"><h3 style="color:#0f0">HANUM</h3><p>SPEED: CEPAT | AWAS PELURU SENDIRI</p></div>
+            <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af"><h3 style="color:#0af">RIKA</h3><p>SPEED: LAMBAT | HP TINGGI</p></div>
+            <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44"><h3 style="color:#f44">SATRI</h3><p>SPEED: GHOST | TRIPLE SHOT</p></div>
+            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#ff00ff"><h3 style="color:#ff00ff">IKA BINAL</h3><p>SPEED: MEDIUM | FAST HOT PINK BULLET</p></div>
+            <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80"><h3 style="color:#f80">HELEN</h3><p>SPEED: BERAT | BIG BULLET</p></div>
         </div>
     </div>
 
@@ -91,7 +104,7 @@
         scout:  { speed: 5.5, bSpeed: 10, bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
         tank:   { speed: 2.2, bSpeed: 6.5, bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
         ghost:  { speed: 4.2, bSpeed: 8, bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
-        sniper: { speed: 3.5, bSpeed: 15, bSize: 5,  hp: 1, color: '#a0f', reload: 3000, burst: 1 },
+        sniper: { speed: 3.5, bSpeed: 15, bSize: 6,  hp: 1, color: '#ff00ff', reload: 3000, burst: 1 },
         heavy:  { speed: 3.2, bSpeed: 7.5, bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
     };
 
@@ -99,32 +112,21 @@
     let enemy = { x: 0, y: 0, r: 25, angle: 0, class: 'scout', currentHp: 1, lastShot: 0, targetX: 0, targetY: 0 };
     let bullets = [], walls = [], stick = { x: 0, y: 0, active: false };
 
-    peer.on('open', id => {
-        document.getElementById('my-id-display').innerText = "YOUR ID: " + id;
-    });
-
-    peer.on('connection', c => {
-        conn = c; 
-        mode = "host"; 
-        showCharSelect('host');
-    });
+    peer.on('open', id => { document.getElementById('my-id-display').innerText = "YOUR ID: " + id; });
+    peer.on('connection', c => { conn = c; mode = "host"; showCharSelect('host'); });
 
     function showOnlineMenu() {
         document.getElementById('main-btns').style.display = 'none';
-        document.getElementById('online-setup').style.display = 'block';
+        document.getElementById('online-setup').style.display = 'flex';
     }
 
     function shareWA() {
         const id = peer.id;
         if(!id) return alert("Peer ID not ready!");
-        const url = `https://wa.me/?text=Duel%20me%20in%20Rika%20War!%20My%20ID:%20${id}`;
-        window.open(url, '_blank');
+        window.open(`https://wa.me/?text=Duel%20me%20in%20Rika%20War!%20My%20ID:%20${id}`, '_blank');
     }
 
-    function copyID() {
-        const id = peer.id;
-        navigator.clipboard.writeText(id).then(() => alert("ID Copied!"));
-    }
+    function copyID() { navigator.clipboard.writeText(peer.id).then(() => alert("ID Copied!")); }
 
     function showCharSelect(m) {
         mode = m;
@@ -132,21 +134,8 @@
         document.getElementById('char-select').style.display = 'flex';
     }
 
-    function goFullScreen() {
-        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-        else if (document.documentElement.webkitRequestFullscreen) document.documentElement.webkitRequestFullscreen();
-    }
-
-    function connectToFriend() {
-        const id = document.getElementById('join-id').value;
-        if(!id) return alert("Please enter an ID");
-        conn = peer.connect(id);
-        mode = "guest"; 
-        conn.on('open', () => showCharSelect('guest'));
-    }
-
     function selectChar(type) {
-        goFullScreen();
+        if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
         player.class = type;
         Object.assign(player, CLASSES[type]);
         player.currentHp = player.hp;
@@ -201,12 +190,12 @@
     }
 
     function generateWalls() {
-        const t = 20;
+        const t = 25;
         let arr = [{x:0, y:0, w:V_WIDTH, h:t}, {x:0, y:V_HEIGHT-t, w:V_WIDTH, h:t}, {x:0, y:0, w:t, h:V_HEIGHT}, {x:V_WIDTH-t, y:0, w:t, h:V_HEIGHT}];
         for(let i=0; i<8; i++) {
             let isV = Math.random() > 0.5;
-            let ww = isV ? 25 : 120 + Math.random()*150;
-            let hh = isV ? 120 + Math.random()*150 : 25;
+            let ww = isV ? 30 : 120 + Math.random()*150;
+            let hh = isV ? 120 + Math.random()*150 : 30;
             let wx = 100 + Math.random() * (V_WIDTH-300);
             let wy = 200 + Math.random() * (V_HEIGHT-500);
             if ((wx < 180 && wy < 180) || (wx > V_WIDTH-250 && wy > V_HEIGHT-250)) continue;
@@ -234,13 +223,14 @@
 
     function spawnBullet(owner, angle) {
         bullets.push({ 
-            x: owner.x + Math.cos(angle)*30, 
-            y: owner.y + Math.sin(angle)*30, 
+            x: owner.x + Math.cos(angle)*35, 
+            y: owner.y + Math.sin(angle)*35, 
             vx: Math.cos(angle)*owner.bSpeed, 
             vy: Math.sin(angle)*owner.bSpeed, 
             r: owner.bSize, 
             color: owner.color, 
-            owner: owner 
+            owner: owner,
+            spawnTime: Date.now()
         });
     }
 
@@ -250,12 +240,7 @@
         let nx = player.x + stick.x * player.speed, ny = player.y + stick.y * player.speed;
         if(!checkWall(player, nx, player.y)) player.x = nx;
         if(!checkWall(player, player.x, ny)) player.y = ny;
-        
-        // Update angle based on movement or joystick
-        if(stick.active && (Math.abs(stick.x) > 0.1 || Math.abs(stick.y) > 0.1)) {
-             player.angle = Math.atan2(stick.y, stick.x);
-        }
-        
+        if(stick.active && (Math.abs(stick.x) > 0.1 || Math.abs(stick.y) > 0.1)) player.angle = Math.atan2(stick.y, stick.x);
         if(conn) conn.send({type:'sync', x:player.x, y:player.y, angle:player.angle});
 
         if(mode === "ai") {
@@ -263,27 +248,51 @@
             enemy.angle = Math.atan2(dy, dx);
             if(d > 350) { 
                 let amx = (dx/d)*(enemy.speed*0.8), amy = (dy/d)*(enemy.speed*0.8);
-                let anx = enemy.x + amx, any = enemy.y + amy;
-                if(!checkWall(enemy, anx, enemy.y)) enemy.x = anx;
-                if(!checkWall(enemy, enemy.x, any)) enemy.y = any;
+                if(!checkWall(enemy, enemy.x + amx, enemy.y)) enemy.x += amx;
+                if(!checkWall(enemy, enemy.x, enemy.y + amy)) enemy.y += amy;
             }
             if(d < 850) fire(enemy, enemy.angle);
         } else {
-            enemy.x += (enemy.targetX - enemy.x) * 0.15; 
-            enemy.y += (enemy.targetY - enemy.y) * 0.15;
+            enemy.x += (enemy.targetX - enemy.x) * 0.15; enemy.y += (enemy.targetY - enemy.y) * 0.15;
             enemy.angle = enemy.targetAngle || 0;
         }
 
+        const now = Date.now();
         for(let i=bullets.length-1; i>=0; i--) {
-            let b = bullets[i]; b.x += b.vx; b.y += b.vy;
-            if(b.x<0||b.x>V_WIDTH||b.y<0||b.y>V_HEIGHT) { bullets.splice(i,1); continue; }
-            let hitW = false;
-            for(let w of walls) { if(b.x>w.x && b.x<w.x+w.w && b.y>w.y && b.y<w.y+w.h) { hitW = true; break; } }
-            if(hitW) { bullets.splice(i,1); continue; }
-            if(b.owner !== player && Math.hypot(b.x-player.x, b.y-player.y) < player.r) {
-                bullets.splice(i,1); player.currentHp--; if(conn) conn.send({type:'hit', target:'player'}); checkDeaths();
-            } else if(b.owner !== enemy && Math.hypot(b.x-enemy.x, b.y-enemy.y) < enemy.r) {
-                bullets.splice(i,1); enemy.currentHp--; if(conn) conn.send({type:'hit', target:'enemy'}); checkDeaths();
+            let b = bullets[i];
+            if(now - b.spawnTime > 10000) { bullets.splice(i,1); continue; }
+            b.x += b.vx; b.y += b.vy;
+
+            for(let w of walls) {
+                if(b.x + b.r > w.x && b.x - b.r < w.x + w.w && b.y + b.r > w.y && b.y - b.r < w.y + w.h) {
+                    let overlapL = (b.x + b.r) - w.x, overlapR = (w.x + w.w) - (b.x - b.r), overlapT = (b.y + b.r) - w.y, overlapB = (w.y + w.h) - (b.y - b.r);
+                    let minOverlap = Math.min(overlapL, overlapR, overlapT, overlapB);
+                    if (minOverlap === overlapL || minOverlap === overlapR) { b.vx *= -1; b.x += (minOverlap === overlapL ? -1 : 1) * 2; } 
+                    else { b.vy *= -1; b.y += (minOverlap === overlapT ? -1 : 1) * 2; }
+                    break; 
+                }
+            }
+
+            if(b.x - b.r < 0 || b.x + b.r > V_WIDTH) b.vx *= -1;
+            if(b.y - b.r < 0 || b.y + b.r > V_HEIGHT) b.vy *= -1;
+
+            // Updated Hit Detection: Friendly Fire Enabled
+            // Added 150ms "Safety Buffer" so bullets don't hit the shooter immediately upon firing.
+            let safetyBuffer = now - b.spawnTime > 150;
+
+            // Check hit on Player
+            if ((b.owner !== player || safetyBuffer) && Math.hypot(b.x - player.x, b.y - player.y) < player.r + b.r) {
+                bullets.splice(i, 1);
+                player.currentHp--;
+                if (conn) conn.send({ type: 'hit', target: 'player' });
+                checkDeaths();
+            } 
+            // Check hit on Enemy
+            else if ((b.owner !== enemy || safetyBuffer) && Math.hypot(b.x - enemy.x, b.y - enemy.y) < enemy.r + b.r) {
+                bullets.splice(i, 1);
+                enemy.currentHp--;
+                if (conn) conn.send({ type: 'hit', target: 'enemy' });
+                checkDeaths();
             }
         }
     }
@@ -299,10 +308,7 @@
         isPaused = true; const n = document.getElementById('notif'); n.innerText = txt; n.style.display = 'block';
         setTimeout(() => { 
             n.style.display = 'none'; 
-            if(mode !== "guest") { 
-                walls = generateWalls(); 
-                if(conn) conn.send({type:'walls', walls: walls}); 
-            } 
+            if(mode !== "guest") { walls = generateWalls(); if(conn) conn.send({type:'walls', walls: walls}); } 
             resetRound(); 
         }, 2000);
     }
@@ -317,17 +323,9 @@
         walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
 
         [player, enemy].forEach(c => {
-            ctx.save(); 
-            ctx.translate(c.x, c.y); 
-            ctx.rotate(c.angle);
-            
-            ctx.fillStyle = c.color; 
-            ctx.beginPath(); ctx.arc(0,0,c.r,0,Math.PI*2); ctx.fill();
-
-            // Nose aligned with rotation (Front)
-            ctx.fillStyle = '#fff'; 
-            ctx.beginPath(); ctx.arc(c.r - 5, 0, 6, 0, Math.PI*2); ctx.fill();
-
+            ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.angle);
+            ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(0,0,c.r,0,Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(c.r - 5, 0, 6, 0, Math.PI*2); ctx.fill();
             ctx.rotate(-c.angle);
             for(let i=0; i<c.hp; i++) { 
                 ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333"; 
@@ -335,7 +333,13 @@
             }
             ctx.restore();
         });
-        bullets.forEach(b => { ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); });
+        
+        bullets.forEach(b => { 
+            ctx.fillStyle = b.color; 
+            ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); 
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 0.4, 0, Math.PI*2); ctx.fill();
+        });
     }
 
     function loop() { update(); draw(); if(gameActive) requestAnimationFrame(loop); }
