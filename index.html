@@ -78,7 +78,7 @@
             <div class="char-card" onclick="selectChar('scout')" style="border-color:#0f0"><h3 style="color:#0f0">HANUM</h3><p>SPEED: CEPAT | CEPAT CAPAI</p></div>
             <div class="char-card" onclick="selectChar('tank')" style="border-color:#0af"><h3 style="color:#0af">RIKA</h3><p>SPEED: LAMBAT | TENAGA BADAK</p></div>
             <div class="char-card" onclick="selectChar('ghost')" style="border-color:#f44"><h3 style="color:#f44">SATRI</h3><p>SPEED: GHOST | CEPAT HILANG KEKAMPUS</p></div>
-            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#ff00ff"><h3 style="color:#ff00ff">IKA BINAL</h3><p>SPEED: MEDIUM | CEPAT KE DAPUR</p></div>
+            <div class="char-card" onclick="selectChar('sniper')" style="border-color:#ff00ff"><h3 style="color:#ff00ff">IKA BINAL</h3><p>SPEED: MEDIUM | CEPAT KEDAPUR</p></div>
             <div class="char-card" onclick="selectChar('heavy')" style="border-color:#f80"><h3 style="color:#f80">HELEN</h3><p>SPEED: BERAT | TENAGA NMAX</p></div>
         </div>
     </div>
@@ -100,17 +100,16 @@
     let pScore = 0, eScore = 0;
 
     const CLASSES = {
-        // Bullet speeds reduced by 30%
-        scout:  { speed: 5.5, bSpeed: 7,    bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
-        tank:   { speed: 2.2, bSpeed: 4.5,  bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
-        ghost:  { speed: 4.2, bSpeed: 5.6,  bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
-        sniper: { speed: 3.5, bSpeed: 10.5, bSize: 6,  hp: 1, color: '#ff00ff', reload: 3000, burst: 1 },
-        heavy:  { speed: 3.2, bSpeed: 5.2,  bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
+        scout:  { speed: 3.8, bSpeed: 2.5,  bSize: 6,  hp: 1, color: '#0f0', reload: 1400, burst: 1 },
+        tank:   { speed: 1.5, bSpeed: 1.6,  bSize: 10, hp: 4, color: '#0af', reload: 2500, burst: 1 },
+        ghost:  { speed: 2.9, bSpeed: 2.0,  bSize: 7,  hp: 1, color: '#f44', reload: 3200, burst: 3 },
+        sniper: { speed: 2.4, bSpeed: 3.7,  bSize: 6,  hp: 1, color: '#ff00ff', reload: 3000, burst: 1 },
+        heavy:  { speed: 2.2, bSpeed: 1.8,  bSize: 14, hp: 2, color: '#f80', reload: 2200, burst: 1 }
     };
 
-    let player = { x: 0, y: 0, r: 25, angle: 0, class: 'scout', currentHp: 1, lastShot: 0 };
-    let enemy = { x: 0, y: 0, r: 25, angle: 0, class: 'scout', currentHp: 1, lastShot: 0, targetX: 0, targetY: 0 };
-    let bullets = [], walls = [], stick = { x: 0, y: 0, active: false };
+    let player = { x: 0, y: 0, r: 35, angle: 0, class: 'scout', currentHp: 1, lastShot: 0 };
+    let enemy = { x: 0, y: 0, r: 35, angle: 0, class: 'scout', currentHp: 1, lastShot: 0, targetX: 0, targetY: 0 };
+    let bullets = [], walls = [], particles = [], stick = { x: 0, y: 0, active: false };
 
     peer.on('open', id => { document.getElementById('my-id-display').innerText = "YOUR ID: " + id; });
     peer.on('connection', c => { conn = c; mode = "host"; showCharSelect('host'); });
@@ -121,8 +120,7 @@
     }
 
     function shareWA() {
-        const id = peer.id;
-        if(!id) return alert("Peer ID not ready!");
+        const id = peer.id; if(!id) return alert("Peer ID not ready!");
         window.open(`https://wa.me/?text=Duel%20me%20in%20Rika%20War!%20My%20ID:%20${id}`, '_blank');
     }
 
@@ -137,28 +135,22 @@
     function connectToFriend() {
         const id = document.getElementById('join-id').value;
         if(!id) return alert("Enter Friend ID!");
-        conn = peer.connect(id);
-        mode = "guest";
-        showCharSelect('guest');
+        conn = peer.connect(id); mode = "guest"; showCharSelect('guest');
     }
 
     function selectChar(type) {
         if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
-        player.class = type;
-        Object.assign(player, CLASSES[type]);
-        player.currentHp = player.hp;
+        player.class = type; Object.assign(player, CLASSES[type]); player.currentHp = player.hp;
         document.getElementById('char-select').style.display = 'none';
         
         if (mode === "guest") { 
-            conn.send({type: 'init', char: type}); 
-            setupRemote(); 
+            conn.send({type: 'init', char: type}); setupRemote(); 
         } else if (mode === "host") { 
             setupRemote(); 
         } else {
             let keys = Object.keys(CLASSES);
             enemy.class = keys[Math.floor(Math.random()*keys.length)];
-            Object.assign(enemy, CLASSES[enemy.class]);
-            enemy.currentHp = enemy.hp;
+            Object.assign(enemy, CLASSES[enemy.class]); enemy.currentHp = enemy.hp;
             startGame();
         }
     }
@@ -169,8 +161,7 @@
                 enemy.class = data.char; Object.assign(enemy, CLASSES[data.char]); enemy.currentHp = enemy.hp;
                 if(mode === "host") {
                     conn.send({type: 'init', char: player.class});
-                    walls = generateWalls();
-                    conn.send({type:'walls', walls: walls});
+                    walls = generateWalls(); conn.send({type:'walls', walls: walls});
                     startGame();
                 }
             }
@@ -186,9 +177,7 @@
         resize();
         document.getElementById('ui').style.display = 'flex';
         document.getElementById('controls').style.display = 'block';
-        resetRound();
-        gameActive = true; 
-        loop();
+        resetRound(); gameActive = true; loop();
     }
 
     function resize() {
@@ -213,36 +202,63 @@
     }
 
     function resetRound() {
-        const p = 120;
+        const p = 150;
         player.x = (mode === "guest") ? V_WIDTH-p : p;
         player.y = (mode === "guest") ? V_HEIGHT-p : p;
         enemy.x = enemy.targetX = (mode === "guest") ? p : V_WIDTH-p;
-        enemy.y = enemy.targetY = (mode === "guest") ? p : V_HEIGHT-p;
+        enemy.y = enemy.targetY = (mode === "guest") ? p : V_WIDTH-p;
         player.currentHp = player.hp; enemy.currentHp = enemy.hp;
-        bullets = []; isPaused = false;
+        bullets = []; particles = []; isPaused = false;
+    }
+
+    function createExplosion(x, y, color) {
+        for(let i=0; i<30; i++) {
+            particles.push({
+                x: x, y: y,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                r: Math.random() * 8 + 2,
+                life: 1.0,
+                color: color
+            });
+        }
     }
 
     function fire(owner, angle) {
         if(Date.now() - owner.lastShot < owner.reload) return;
+        if(owner === enemy && mode === "ai" && isWallInFront(owner, angle, 120)) return; 
         owner.lastShot = Date.now();
         for(let i=0; i<owner.burst; i++) setTimeout(() => spawnBullet(owner, angle), i * 160);
         if(owner === player && conn) conn.send({type:'fire', angle: angle});
     }
 
+    function isWallInFront(o, angle, dist) {
+        for(let step = 40; step <= dist; step += 20) {
+            let checkX = o.x + Math.cos(angle) * step;
+            let checkY = o.y + Math.sin(angle) * step;
+            for(let w of walls) if(checkX > w.x && checkX < w.x + w.w && checkY > w.y && checkY < w.y + w.h) return true;
+        }
+        return false;
+    }
+
     function spawnBullet(owner, angle) {
+        let spawnDist = owner.r + 20;
         bullets.push({ 
-            x: owner.x + Math.cos(angle)*35, 
-            y: owner.y + Math.sin(angle)*35, 
-            vx: Math.cos(angle)*owner.bSpeed, 
-            vy: Math.sin(angle)*owner.bSpeed, 
-            r: owner.bSize, 
-            color: owner.color, 
-            owner: owner,
-            spawnTime: Date.now()
+            x: owner.x + Math.cos(angle) * spawnDist, y: owner.y + Math.sin(angle) * spawnDist, 
+            vx: Math.cos(angle)*owner.bSpeed, vy: Math.sin(angle)*owner.bSpeed, 
+            r: owner.bSize, color: owner.color, owner: owner, spawnTime: Date.now()
         });
     }
 
     function update() {
+        // Update particles even if round is "paused" (so explosion plays out)
+        for(let i=particles.length-1; i>=0; i--) {
+            let p = particles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.life -= 0.02;
+            if(p.life <= 0) particles.splice(i, 1);
+        }
+
         if(!gameActive || isPaused) return;
 
         let nx = player.x + stick.x * player.speed, ny = player.y + stick.y * player.speed;
@@ -280,21 +296,17 @@
                     break; 
                 }
             }
-
             if(b.x - b.r < 0 || b.x + b.r > V_WIDTH) b.vx *= -1;
             if(b.y - b.r < 0 || b.y + b.r > V_HEIGHT) b.vy *= -1;
 
-            let safetyBuffer = now - b.spawnTime > 150;
-
+            let safetyBuffer = now - b.spawnTime > 250;
             if ((b.owner !== player || safetyBuffer) && Math.hypot(b.x - player.x, b.y - player.y) < player.r + b.r) {
-                bullets.splice(i, 1);
-                player.currentHp--;
+                bullets.splice(i, 1); player.currentHp--;
                 if (conn) conn.send({ type: 'hit', target: 'player' });
                 checkDeaths();
             } 
             else if ((b.owner !== enemy || safetyBuffer) && Math.hypot(b.x - enemy.x, b.y - enemy.y) < enemy.r + b.r) {
-                bullets.splice(i, 1);
-                enemy.currentHp--;
+                bullets.splice(i, 1); enemy.currentHp--;
                 if (conn) conn.send({ type: 'hit', target: 'enemy' });
                 checkDeaths();
             }
@@ -303,8 +315,16 @@
 
     function checkDeaths() {
         if(isPaused) return;
-        if(player.currentHp <= 0) { eScore++; finishRound("MISSION FAILED"); }
-        else if(enemy.currentHp <= 0) { pScore++; finishRound("VICTORY"); }
+        if(player.currentHp <= 0) { 
+            eScore++; 
+            createExplosion(player.x, player.y, player.color);
+            finishRound("MISSION FAILED"); 
+        }
+        else if(enemy.currentHp <= 0) { 
+            pScore++; 
+            createExplosion(enemy.x, enemy.y, enemy.color);
+            finishRound("VICTORY"); 
+        }
         document.getElementById('pScore').innerText = pScore; document.getElementById('eScore').innerText = eScore;
     }
 
@@ -323,26 +343,33 @@
         ctx.setTransform(1,0,0,1,0,0);
         ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
         ctx.scale(scale, scale);
-        ctx.fillStyle = "#0ff";
-        walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
+        ctx.fillStyle = "#0ff"; walls.forEach(w => ctx.fillRect(w.x, w.y, w.w, w.h));
 
+        // Draw Characters (Only if not dead during round pause)
         [player, enemy].forEach(c => {
+            if(isPaused && c.currentHp <= 0) return;
             ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.angle);
             ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(0,0,c.r,0,Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(c.r - 5, 0, 6, 0, Math.PI*2); ctx.fill();
-            ctx.rotate(-c.angle);
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(c.r - 10, 0, 10, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(c.r - 5, 0, 4, 0, Math.PI*2); ctx.fill();
             for(let i=0; i<c.hp; i++) { 
                 ctx.fillStyle = (i < c.currentHp) ? "#fff" : "#333"; 
-                ctx.fillRect(-22 + i*12, 14 + c.r/2, 8, 8); 
+                ctx.fillRect(-c.r - 15, -18 + i*12, 10, 10); 
             }
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-c.r + 5, 0, 6, 0, Math.PI*2); ctx.fill();
             ctx.restore();
         });
         
         bullets.forEach(b => { 
-            ctx.fillStyle = b.color; 
-            ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); 
-            ctx.fillStyle = '#fff';
-            ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 0.4, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill(); 
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 0.4, 0, Math.PI*2); ctx.fill();
+        });
+
+        particles.forEach(p => {
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+            ctx.globalAlpha = 1.0;
         });
     }
 
